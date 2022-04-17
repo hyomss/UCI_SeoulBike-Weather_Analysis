@@ -1,0 +1,87 @@
+---
+title: "Seoul_Bike"
+author: "Hyomin"
+date: '2022 4 17 '
+output: html_document
+---
+
+Data set Source:
+
+Sathishkumar V E, Jangwoo Park, and Yongyun Cho. 'Using data mining techniques for bike sharing demand prediction in metropolitan city.' Computer Communications, Vol.153, pp.353-366, March, 2020
+Sathishkumar V E and Yongyun Cho. 'A rule-based model for Seoul Bike sharing demand prediction using weather data' European Journal of Remote Sensing, pp. 1-18, Feb, 2020
+
+Dua, D. and Graff, C. (2019). UCI Machine Learning Repository [http://archive.ics.uci.edu/ml]. Irvine, CA: University of California, School of Information and Computer Science.
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+## Load Data
+
+```{r}
+data_frame = read.csv('SeoulBikeData.csv')
+# Call data
+summary(data_frame)
+# data특성 요약 - mean, max, min 등
+
+```
+
+## Check Original Data format
+```{r}
+head(data_frame)
+```
+
+## Plot
+
+```{r}
+plot(x=data_frame$Temperature, y= data_frame$Rented.Bike.Count)
+```
+
+## Modeling - Linear Regression
+
+```{r}
+# y = ax + b (y= bike rent cnt, x = temp -> find best a,b)라는 문제를 푸는 것
+
+linear_regression_model = glm(formula = Rented.Bike.Count ~ Temperature, data = data_frame)
+
+#glm(): find result (a & b)
+# save result(a & b) to 'linear_regression_model' 
+# Y ~ X : used parameters 
+
+summary(linear_regression_model)
+
+# intercept == b (329.9525)
+# Temparature == a (29.0811)
+```
+
+
+## Test this model
+
+```{r}
+
+temp = 23
+a = 29.0811
+b = 329.9525
+y = a*temp + b
+y
+# Bike rent coutn when temperature is 23 celcius
+```
+
+## Prediction Model
+
+```{r}
+predict(linear_regression_model, newdata=data.frame(Temperature=c(23)))
+```
+
+## Plot the best fit line in red using the derived parameters  
+```{r}
+plot(x=data_frame$Temperature ,y=data_frame$Rented.Bike.Count)
+abline(a=b,b=a, col='red')
+# show line
+```
+
+## Show several predicted bike counts according to given temperatures
+```{r}
+temperature_list = c(-10,0,10,20,30,40)
+pred_list = predict(linear_regression_model, newdata=data.frame(Temperature=temperature_list))
+data.frame(Temperature=temperature_list, Pred_bike_count=pred_list)
